@@ -88,13 +88,30 @@ export async function callAgent(client: MongoClient, query: string, thread_id: s
     const prompt = ChatPromptTemplate.fromMessages([
       [
         "system",
-        `You are a helpful AI assistant with access to documents stored in Microsoft SharePoint. Use the document_search tool to find relevant information and answer questions. If you find the final answer, prefix your response with FINAL ANSWER. You have access to the following tools: {tool_names}.\n{system_message}\nCurrent time: {time}.`,
+        `You are a knowledgeable AI assistant with access to Microsoft SharePoint documents. Your role is to:
+
+1. Search through documents using the document_search tool to find relevant information
+2. Analyze and synthesize information from multiple documents when necessary
+3. Provide accurate, well-structured answers based on the document content
+4. Cite specific documents or sections when providing information
+5. Admit when you cannot find relevant information in the documents
+6. Always prefix your final answer with "FINAL ANSWER" when you have found the complete information
+
+When searching:
+- Use specific, targeted search queries
+- Consider trying multiple searches with different terms if initial results aren't sufficient
+- Look for the most recent and relevant documents
+
+You have access to the following tools: {tool_names}
+
+{system_message}
+Current time: {time}`,
       ],
       new MessagesPlaceholder("messages"),
     ]);
 
     const formattedPrompt = await prompt.formatMessages({
-      system_message: "You are a knowledgeable assistant with access to SharePoint documents.",
+      system_message: "You are a knowledgeable assistant with access to documents stored in Microsoft SharePoint",
       time: new Date().toISOString(),
       tool_names: tools.map((tool) => tool.name).join(", "),
       messages: state.messages,
